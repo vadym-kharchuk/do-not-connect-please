@@ -46,11 +46,11 @@ export PATH="$HOME/.local/bin:$PATH"
 ## Usage
 
 ```bash
-do-not-connect-please              # list configured devices
-do-not-connect-please on           # connect all
-do-not-connect-please on <name>    # connect by name
-do-not-connect-please off          # disconnect all
-do-not-connect-please off <name>   # disconnect by name
+do-not-connect-please          # list configured devices with their numbers
+do-not-connect-please on       # connect all
+do-not-connect-please on 2     # connect device #2
+do-not-connect-please off      # disconnect all
+do-not-connect-please off 2    # disconnect device #2
 ```
 
 On every login, all configured devices are automatically disconnected after 10 seconds.
