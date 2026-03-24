@@ -17,7 +17,10 @@ echo "Scanning for paired Bluetooth devices..."
 echo ""
 
 # Get paired devices as array of "address name"
-mapfile -t DEVICES < <(blueutil --paired | awk -F'address: | name: |,' '{print $2, $4}' | sed 's/^ *//;s/ *$//')
+DEVICES=()
+while IFS= read -r line; do
+  DEVICES+=("$line")
+done < <(blueutil --paired | awk -F'address: | name: |,' '{print $2, $4}' | sed 's/^ *//;s/ *$//')
 
 if [ ${#DEVICES[@]} -eq 0 ]; then
   echo "No paired Bluetooth devices found."
