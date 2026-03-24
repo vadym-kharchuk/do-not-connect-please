@@ -20,7 +20,7 @@ echo ""
 DEVICES=()
 while IFS= read -r line; do
   DEVICES+=("$line")
-done < <(blueutil --paired | awk -F'address: | name: |,' '{print $2, $4}' | sed 's/^ *//;s/ *$//')
+done < <(blueutil --paired | sed -n 's/.*address: \([^,]*\).*name: "\([^"]*\)".*/\1|\2/p')
 
 if [ ${#DEVICES[@]} -eq 0 ]; then
   echo "No paired Bluetooth devices found."
@@ -30,8 +30,8 @@ fi
 echo "Select a device to manage:"
 echo ""
 for i in "${!DEVICES[@]}"; do
-  ADDR=$(echo "${DEVICES[$i]}" | awk '{print $1}')
-  NAME=$(echo "${DEVICES[$i]}" | cut -d' ' -f2-)
+  ADDR=$(echo "${DEVICES[$i]}" | cut -d'|' -f1)
+  NAME=$(echo "${DEVICES[$i]}" | cut -d'|' -f2-)
   printf "  %2d)  %s  (%s)\n" $((i+1)) "$NAME" "$ADDR"
 done
 echo ""
@@ -45,8 +45,8 @@ while true; do
 done
 
 SELECTED="${DEVICES[$((CHOICE-1))]}"
-DEVICE_ADDR=$(echo "$SELECTED" | awk '{print $1}')
-DEVICE_NAME=$(echo "$SELECTED" | cut -d' ' -f2-)
+DEVICE_ADDR=$(echo "$SELECTED" | cut -d'|' -f1)
+DEVICE_NAME=$(echo "$SELECTED" | cut -d'|' -f2-)
 
 echo ""
 echo "Selected: $DEVICE_NAME ($DEVICE_ADDR)"
