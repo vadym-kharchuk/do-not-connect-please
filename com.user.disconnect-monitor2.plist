@@ -6,7 +6,7 @@
     <string>com.user.disconnect-monitor2</string>
     <key>ProgramArguments</key>
     <array>
-        <string>/Users/vadymkharchuk/.local/bin/disconnect-monitor2.sh</string>
+        <string>SCRIPT_PATH</string>
     </array>
     <key>RunAtLoad</key>
     <true/>

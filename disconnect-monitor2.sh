@@ -1,4 +1,12 @@
 #!/bin/bash
-# Disconnect "Monitor 2" headphones to prevent auto-connection
+CONFIG_FILE="$HOME/.config/monitor2/device"
+
+if [ ! -f "$CONFIG_FILE" ]; then
+  echo "No device configured. Run install.sh first."
+  exit 1
+fi
+
+DEVICE_ADDR=$(sed -n '1p' "$CONFIG_FILE")
+
 sleep 10  # Wait for Bluetooth stack to settle after login
-/opt/homebrew/bin/blueutil --disconnect 9c-0d-ac-04-c8-b1
+/opt/homebrew/bin/blueutil --disconnect "$DEVICE_ADDR"
