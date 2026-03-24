@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
     <key>Label</key>
-    <string>com.user.disconnect-monitor2</string>
+    <string>com.user.do-not-connect-please</string>
     <key>ProgramArguments</key>
     <array>
         <string>SCRIPT_PATH</string>

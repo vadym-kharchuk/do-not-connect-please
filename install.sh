@@ -4,8 +4,8 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 BIN_DIR="$HOME/.local/bin"
 LAUNCH_AGENTS="$HOME/Library/LaunchAgents"
-PLIST="com.user.disconnect-monitor2.plist"
-CONFIG_FILE="$HOME/.config/monitor2/device"
+PLIST="com.user.do-not-connect-please.plist"
+CONFIG_FILE="$HOME/.config/do-not-connect-please/device"
 
 # Check blueutil
 if ! command -v blueutil &>/dev/null; then
@@ -56,15 +56,15 @@ printf "%s\n%s\n" "$DEVICE_ADDR" "$DEVICE_NAME" > "$CONFIG_FILE"
 # Install scripts
 mkdir -p "$BIN_DIR"
 
-cp "$SCRIPT_DIR/disconnect-monitor2.sh" "$BIN_DIR/disconnect-monitor2.sh"
-chmod +x "$BIN_DIR/disconnect-monitor2.sh"
+cp "$SCRIPT_DIR/do-not-connect-please.sh" "$BIN_DIR/do-not-connect-please"
+chmod +x "$BIN_DIR/do-not-connect-please"
 
-cp "$SCRIPT_DIR/monitor2.sh" "$BIN_DIR/monitor2"
-chmod +x "$BIN_DIR/monitor2"
+cp "$SCRIPT_DIR/bt-disconnect-on-login.sh" "$BIN_DIR/bt-disconnect-on-login"
+chmod +x "$BIN_DIR/bt-disconnect-on-login"
 
 # Install LaunchAgent (with resolved path to script)
-sed "s|SCRIPT_PATH|$BIN_DIR/disconnect-monitor2.sh|g" \
-  "$SCRIPT_DIR/com.user.disconnect-monitor2.plist" \
+sed "s|SCRIPT_PATH|$BIN_DIR/bt-disconnect-on-login|g" \
+  "$SCRIPT_DIR/com.user.do-not-connect-please.plist" \
   > "$LAUNCH_AGENTS/$PLIST"
 
 # Load LaunchAgent
@@ -76,8 +76,8 @@ echo ""
 echo "  $DEVICE_NAME will be disconnected automatically on login."
 echo ""
 echo "Usage:"
-echo "  monitor2        — connect"
-echo "  monitor2 off    — disconnect"
+echo "  do-not-connect-please        — connect"
+echo "  do-not-connect-please off    — disconnect"
 echo ""
 echo "Make sure $BIN_DIR is in your PATH:"
 echo "  export PATH=\"\$HOME/.local/bin:\$PATH\""

@@ -1,5 +1,5 @@
 #!/bin/bash
-CONFIG_FILE="$HOME/.config/monitor2/device"
+CONFIG_FILE="$HOME/.config/do-not-connect-please/device"
 
 if [ ! -f "$CONFIG_FILE" ]; then
   echo "No device configured. Run install.sh first."
