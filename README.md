@@ -13,9 +13,7 @@ brew install blueutil
 ```bash
 git clone https://github.com/vadymkharchuk/do-not-connect-please
 cd do-not-connect-please
-xattr -r -d com.apple.quarantine .
-chmod +x install.sh
-./install.sh
+bash install.sh
 ```
 
 The installer lists all your paired Bluetooth devices and lets you pick one or more:

@@ -67,14 +67,15 @@ echo ""
 # Install scripts
 mkdir -p "$BIN_DIR"
 
-cp "$SCRIPT_DIR/do-not-connect-please.sh" "$BIN_DIR/do-not-connect-please"
+cp "$SCRIPT_DIR/do-not-connect-please.sh" "$BIN_DIR/do-not-connect-please.sh"
+# Wrapper so the CLI works without relying on execute permission
+printf '#!/bin/bash\nexec /bin/bash "%s/do-not-connect-please.sh" "$@"\n' "$BIN_DIR" > "$BIN_DIR/do-not-connect-please"
 chmod +x "$BIN_DIR/do-not-connect-please"
 
-cp "$SCRIPT_DIR/bt-disconnect-on-login.sh" "$BIN_DIR/bt-disconnect-on-login"
-chmod +x "$BIN_DIR/bt-disconnect-on-login"
+cp "$SCRIPT_DIR/bt-disconnect-on-login.sh" "$BIN_DIR/bt-disconnect-on-login.sh"
 
 # Install LaunchAgent (with resolved path to script)
-sed "s|SCRIPT_PATH|$BIN_DIR/bt-disconnect-on-login|g" \
+sed "s|SCRIPT_PATH|$BIN_DIR/bt-disconnect-on-login.sh|g" \
   "$SCRIPT_DIR/com.user.do-not-connect-please.plist" \
   > "$LAUNCH_AGENTS/$PLIST"
 
@@ -88,9 +89,9 @@ echo ""
 echo "Usage:"
 echo "  do-not-connect-please            — list configured devices"
 echo "  do-not-connect-please on         — connect all"
-echo "  do-not-connect-please on <name>  — connect by name"
+echo "  do-not-connect-please on 2       — connect device #2"
 echo "  do-not-connect-please off        — disconnect all"
-echo "  do-not-connect-please off <name> — disconnect by name"
+echo "  do-not-connect-please off 2      — disconnect device #2"
 echo ""
 echo "Make sure $BIN_DIR is in your PATH:"
 echo "  export PATH=\"\$HOME/.local/bin:\$PATH\""
