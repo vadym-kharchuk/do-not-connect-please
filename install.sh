@@ -7,6 +7,9 @@ LAUNCH_AGENTS="$HOME/Library/LaunchAgents"
 PLIST="com.user.do-not-connect-please.plist"
 CONFIG_FILE="$HOME/.config/do-not-connect-please/devices"
 
+# Remove macOS quarantine flag (set on files downloaded from the internet)
+xattr -r -d com.apple.quarantine "$SCRIPT_DIR" 2>/dev/null || true
+
 # Check blueutil
 if ! command -v blueutil &>/dev/null; then
   echo "blueutil not found. Install it with: brew install blueutil"

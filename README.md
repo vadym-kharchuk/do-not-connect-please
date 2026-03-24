@@ -17,6 +17,8 @@ chmod +x install.sh
 ./install.sh
 ```
 
+> **macOS "operation not permitted"?** Run `xattr -r -d com.apple.quarantine .` in the repo folder, then retry.
+
 The installer lists all your paired Bluetooth devices and lets you pick one or more:
 
 ```
