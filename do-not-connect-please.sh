@@ -1,19 +1,46 @@
 #!/bin/bash
-CONFIG_FILE="$HOME/.config/do-not-connect-please/device"
+CONFIG_FILE="$HOME/.config/do-not-connect-please/devices"
 
 if [ ! -f "$CONFIG_FILE" ]; then
-  echo "No device configured. Run install.sh first."
+  echo "No devices configured. Run install.sh first."
   exit 1
 fi
 
-DEVICE_ADDR=$(sed -n '1p' "$CONFIG_FILE")
-DEVICE_NAME=$(sed -n '2p' "$CONFIG_FILE")
+ACTION="$1"
+FILTER="$2"
 
-case "$1" in
-  off)
-    blueutil --disconnect "$DEVICE_ADDR" && echo "$DEVICE_NAME disconnected"
+do_action() {
+  local addr="$1"
+  local name="$2"
+  if [ "$ACTION" = "off" ]; then
+    blueutil --disconnect "$addr" && echo "$name disconnected"
+  else
+    blueutil --connect "$addr" && echo "$name connected"
+  fi
+}
+
+case "$ACTION" in
+  on|off)
+    while IFS= read -r line; do
+      ADDR=$(echo "$line" | cut -d'|' -f1)
+      NAME=$(echo "$line" | cut -d'|' -f2-)
+      if [ -z "$FILTER" ] || echo "$NAME" | grep -qi "$FILTER"; then
+        do_action "$ADDR" "$NAME"
+      fi
+    done < "$CONFIG_FILE"
     ;;
   *)
-    blueutil --connect "$DEVICE_ADDR" && echo "$DEVICE_NAME connected"
+    echo "Configured devices:"
+    while IFS= read -r line; do
+      NAME=$(echo "$line" | cut -d'|' -f2-)
+      ADDR=$(echo "$line" | cut -d'|' -f1)
+      echo "  - $NAME  ($ADDR)"
+    done < "$CONFIG_FILE"
+    echo ""
+    echo "Usage:"
+    echo "  do-not-connect-please on         — connect all"
+    echo "  do-not-connect-please on <name>  — connect by name"
+    echo "  do-not-connect-please off        — disconnect all"
+    echo "  do-not-connect-please off <name> — disconnect by name"
     ;;
 esac

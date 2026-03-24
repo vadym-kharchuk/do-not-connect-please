@@ -1,6 +1,6 @@
 # do-not-connect-please
 
-Prevent a Bluetooth device from auto-connecting on macOS login, with a simple CLI to connect/disconnect on demand.
+Prevent Bluetooth devices from auto-connecting on macOS login, with a simple CLI to connect/disconnect on demand.
 
 ## Requirements
 
@@ -17,20 +17,23 @@ chmod +x install.sh
 ./install.sh
 ```
 
-The installer lists all your paired Bluetooth devices and lets you pick one:
+The installer lists all your paired Bluetooth devices and lets you pick one or more:
 
 ```
 Scanning for paired Bluetooth devices...
 
-Select a device to manage:
+Select devices to manage (space-separated numbers, e.g. 1 3):
 
    1)  AirPods Pro   (aa-bb-cc-dd-ee-ff)
    2)  Monitor 2     (11-22-33-44-55-66)
    3)  Magic Mouse   (99-88-77-66-55-44)
 
-Enter number [1-3]: 2
+Enter numbers [1-3]: 1 2
 
-Selected: Monitor 2 (11-22-33-44-55-66)
+Selected devices:
+  - AirPods Pro
+  - Monitor 2
+
 Installed successfully!
 ```
 
@@ -43,24 +46,27 @@ export PATH="$HOME/.local/bin:$PATH"
 ## Usage
 
 ```bash
-do-not-connect-please        # connect
-do-not-connect-please off    # disconnect
+do-not-connect-please              # list configured devices
+do-not-connect-please on           # connect all
+do-not-connect-please on <name>    # connect by name
+do-not-connect-please off          # disconnect all
+do-not-connect-please off <name>   # disconnect by name
 ```
 
-On every login, the selected device is automatically disconnected after 10 seconds.
+On every login, all configured devices are automatically disconnected after 10 seconds.
 
-To change the device, run `./install.sh` again.
+To change the selection, run `./install.sh` again.
 
 ## Files
 
 | File | Purpose |
 |------|---------|
 | `install.sh` | Interactive device picker, installs everything |
-| `bt-disconnect-on-login.sh` | Runs on login, disconnects the selected device after 10s |
+| `bt-disconnect-on-login.sh` | Runs on login, disconnects all configured devices after 10s |
 | `do-not-connect-please.sh` | CLI installed as `do-not-connect-please` |
 | `com.user.do-not-connect-please.plist` | LaunchAgent template |
 
-Device config is stored at `~/.config/do-not-connect-please/device` (not tracked by git).
+Device config is stored at `~/.config/do-not-connect-please/devices` (not tracked by git).
 
 ## Uninstall
 

@@ -5,7 +5,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 BIN_DIR="$HOME/.local/bin"
 LAUNCH_AGENTS="$HOME/Library/LaunchAgents"
 PLIST="com.user.do-not-connect-please.plist"
-CONFIG_FILE="$HOME/.config/do-not-connect-please/device"
+CONFIG_FILE="$HOME/.config/do-not-connect-please/devices"
 
 # Check blueutil
 if ! command -v blueutil &>/dev/null; then
@@ -16,7 +16,6 @@ fi
 echo "Scanning for paired Bluetooth devices..."
 echo ""
 
-# Get paired devices as array of "address name"
 DEVICES=()
 while IFS= read -r line; do
   DEVICES+=("$line")
@@ -27,7 +26,7 @@ if [ ${#DEVICES[@]} -eq 0 ]; then
   exit 1
 fi
 
-echo "Select a device to manage:"
+echo "Select devices to manage (space-separated numbers, e.g. 1 3):"
 echo ""
 for i in "${!DEVICES[@]}"; do
   ADDR=$(echo "${DEVICES[$i]}" | cut -d'|' -f1)
@@ -37,24 +36,30 @@ done
 echo ""
 
 while true; do
-  read -rp "Enter number [1-${#DEVICES[@]}]: " CHOICE
-  if [[ "$CHOICE" =~ ^[0-9]+$ ]] && [ "$CHOICE" -ge 1 ] && [ "$CHOICE" -le "${#DEVICES[@]}" ]; then
-    break
-  fi
-  echo "Invalid choice, try again."
+  read -rp "Enter numbers [1-${#DEVICES[@]}]: " -a CHOICES
+  VALID=true
+  for C in "${CHOICES[@]}"; do
+    if ! [[ "$C" =~ ^[0-9]+$ ]] || [ "$C" -lt 1 ] || [ "$C" -gt "${#DEVICES[@]}" ]; then
+      echo "Invalid choice: $C. Try again."
+      VALID=false
+      break
+    fi
+  done
+  [ "$VALID" = true ] && [ ${#CHOICES[@]} -gt 0 ] && break
 done
 
-SELECTED="${DEVICES[$((CHOICE-1))]}"
-DEVICE_ADDR=$(echo "$SELECTED" | cut -d'|' -f1)
-DEVICE_NAME=$(echo "$SELECTED" | cut -d'|' -f2-)
-
-echo ""
-echo "Selected: $DEVICE_NAME ($DEVICE_ADDR)"
-echo ""
-
-# Save config
+# Save config (one address|name per line)
 mkdir -p "$(dirname "$CONFIG_FILE")"
-printf "%s\n%s\n" "$DEVICE_ADDR" "$DEVICE_NAME" > "$CONFIG_FILE"
+> "$CONFIG_FILE"
+echo ""
+echo "Selected devices:"
+for C in "${CHOICES[@]}"; do
+  ENTRY="${DEVICES[$((C-1))]}"
+  echo "$ENTRY" >> "$CONFIG_FILE"
+  NAME=$(echo "$ENTRY" | cut -d'|' -f2-)
+  echo "  - $NAME"
+done
+echo ""
 
 # Install scripts
 mkdir -p "$BIN_DIR"
@@ -75,12 +80,14 @@ launchctl unload "$LAUNCH_AGENTS/$PLIST" 2>/dev/null || true
 launchctl load "$LAUNCH_AGENTS/$PLIST"
 
 echo "Installed successfully!"
-echo ""
-echo "  $DEVICE_NAME will be disconnected automatically on login."
+echo "These devices will be disconnected automatically on login."
 echo ""
 echo "Usage:"
-echo "  do-not-connect-please        — connect"
-echo "  do-not-connect-please off    — disconnect"
+echo "  do-not-connect-please            — list configured devices"
+echo "  do-not-connect-please on         — connect all"
+echo "  do-not-connect-please on <name>  — connect by name"
+echo "  do-not-connect-please off        — disconnect all"
+echo "  do-not-connect-please off <name> — disconnect by name"
 echo ""
 echo "Make sure $BIN_DIR is in your PATH:"
 echo "  export PATH=\"\$HOME/.local/bin:\$PATH\""

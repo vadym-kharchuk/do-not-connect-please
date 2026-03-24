@@ -1,12 +1,13 @@
 #!/bin/bash
-CONFIG_FILE="$HOME/.config/do-not-connect-please/device"
+CONFIG_FILE="$HOME/.config/do-not-connect-please/devices"
 
 if [ ! -f "$CONFIG_FILE" ]; then
-  echo "No device configured. Run install.sh first."
-  exit 1
+  exit 0
 fi
 
-DEVICE_ADDR=$(sed -n '1p' "$CONFIG_FILE")
-
 sleep 10  # Wait for Bluetooth stack to settle after login
-/opt/homebrew/bin/blueutil --disconnect "$DEVICE_ADDR"
+
+while IFS= read -r line; do
+  ADDR=$(echo "$line" | cut -d'|' -f1)
+  /opt/homebrew/bin/blueutil --disconnect "$ADDR"
+done < "$CONFIG_FILE"
